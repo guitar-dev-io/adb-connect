@@ -1,50 +1,99 @@
 {
   "name": "adb-connect-vscode",
-  "displayName": "ADB Connect - Wireless Android Debugging",
-  "description": "Connect Android devices wirelessly from your IDE with pairing code, discovery, device manager and smart reconnect.",
+  "displayName": "ADB Connect — Wireless Android Debugging",
+  "description": "Pair and connect Android devices over Wi-Fi in one click: real QR pairing, six-digit code pairing, mDNS discovery, device manager and smart auto-reconnect.",
+  "version": "0.2.0",
   "publisher": "guitar-dev-io",
-  "version": "0.1.0",
   "license": "MIT",
-  "engines": {
-    "vscode": "^1.85.0"
-  },
-  "categories": ["Other", "Debuggers"],
-  "keywords": ["adb", "android", "wireless debugging", "pair", "device", "flutter"],
+  "icon": "media/icon.png",
+  "galleryBanner": { "color": "#0E141D", "theme": "dark" },
+  "repository": { "type": "git", "url": "https://github.com/guitar-dev-io/adb-connect.git" },
+  "bugs": { "url": "https://github.com/guitar-dev-io/adb-connect/issues" },
+  "homepage": "https://github.com/guitar-dev-io/adb-connect#readme",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Debuggers", "Other"],
+  "keywords": ["adb", "android", "wireless debugging", "adb pair", "qr", "flutter", "react native", "device"],
   "main": "./dist/extension.js",
   "activationEvents": ["onStartupFinished"],
+  "extensionKind": ["ui", "workspace"],
+  "capabilities": {
+    "untrustedWorkspaces": { "supported": true, "description": "ADB Connect never runs workspace code. The adb path can only be set in user (machine) settings." },
+    "virtualWorkspaces": true
+  },
   "contributes": {
     "commands": [
-      { "command": "adbConnect.menu", "title": "ADB Connect: Quick Actions" },
-      { "command": "adbConnect.devices", "title": "ADB Connect: Device Manager" },
-      { "command": "adbConnect.pairCode", "title": "ADB Connect: Pair with 6-digit Code" },
-      { "command": "adbConnect.pairQr", "title": "ADB Connect: Pair via QR (Guide)" },
-      { "command": "adbConnect.connect", "title": "ADB Connect: Connect by IP:Port" },
-      { "command": "adbConnect.discover", "title": "ADB Connect: Discover Devices" },
-      { "command": "adbConnect.reconnect", "title": "ADB Connect: Reconnect Known Devices" },
-      { "command": "adbConnect.disconnect", "title": "ADB Connect: Disconnect Device" },
-      { "command": "adbConnect.logs", "title": "ADB Connect: Show Logs" }
+      { "command": "adbConnect.menu", "title": "Quick Actions", "category": "ADB Connect" },
+      { "command": "adbConnect.connect", "title": "Connect Device", "category": "ADB Connect", "icon": "$(plug)" },
+      { "command": "adbConnect.reconnect", "title": "Reconnect", "category": "ADB Connect", "icon": "$(sync)" },
+      { "command": "adbConnect.disconnect", "title": "Disconnect", "category": "ADB Connect", "icon": "$(debug-disconnect)" },
+      { "command": "adbConnect.pairQr", "title": "Pair via QR Code", "category": "ADB Connect", "icon": "$(device-camera)" },
+      { "command": "adbConnect.pairCode", "title": "Pair via Pairing Code", "category": "ADB Connect", "icon": "$(key)" },
+      { "command": "adbConnect.discover", "title": "Discover Devices", "category": "ADB Connect", "icon": "$(search)" },
+      { "command": "adbConnect.devices", "title": "Manage Devices", "category": "ADB Connect", "icon": "$(list-unordered)" },
+      { "command": "adbConnect.settings", "title": "Settings", "category": "ADB Connect", "icon": "$(gear)" },
+      { "command": "adbConnect.logs", "title": "View Logs", "category": "ADB Connect", "icon": "$(output)" }
     ],
     "configuration": {
       "title": "ADB Connect",
       "properties": {
-        "adbConnect.adbPath": { "type": "string", "default": "adb", "scope": "machine", "description": "Path to adb executable. Uses system PATH by default." },
-        "adbConnect.autoReconnect": { "type": "boolean", "default": true, "description": "On IDE startup, reconnect only to device endpoints you connected to before." },
-        "adbConnect.showStatusBar": { "type": "boolean", "default": true, "description": "Show ADB Connect in the status bar." },
-        "adbConnect.refreshIntervalSeconds": { "type": "number", "default": 15, "minimum": 5, "maximum": 300, "description": "Device status refresh interval in seconds." },
-        "adbConnect.knownEndpoints": { "type": "array", "items": { "type": "string" }, "default": [], "scope": "application", "description": "Wireless host:port endpoints remembered after a successful connect. Removed on manual disconnect. Not secret." }
+        "adbConnect.adbPath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "markdownDescription": "Path to the `adb` executable. Leave empty to auto-detect (`ANDROID_HOME`, `ANDROID_SDK_ROOT`, `PATH`, default SDK location)."
+        },
+        "adbConnect.autoDiscover": {
+          "type": "boolean",
+          "default": true,
+          "description": "Continuously discover Android devices advertising Wireless debugging on the local network (mDNS, via the adb server)."
+        },
+        "adbConnect.autoReconnect": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically reconnect remembered devices when they drop or reappear on the network. Never connects unknown devices and never reconnects a device you disconnected."
+        },
+        "adbConnect.reconnectOnStartup": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Reconnect remembered devices when the IDE starts. Requires `#adbConnect.autoReconnect#`."
+        },
+        "adbConnect.showStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the ADB Connect device status in the status bar."
+        },
+        "adbConnect.preferredDevice": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Device shown in the status bar when several are connected. Set it from **Manage Devices**. ADB Connect does not change other tools' device selection."
+        },
+        "adbConnect.debugLogging": {
+          "type": "boolean",
+          "default": false,
+          "description": "Write every adb invocation (with secrets redacted) to the ADB Connect log."
+        }
       }
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "watch": "tsc -w -p tsconfig.json"
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:unit": "tsc -p tsconfig.test.json && node --test \"out/test/unit/**/*.test.js\"",
+    "test:integration": "npm run build && tsc -p tsconfig.test.json && node out/test/runIntegration.js",
+    "test": "npm run typecheck && npm run test:unit",
+    "package": "npm run build && vsce package --no-dependencies --out ../../dist/",
+    "package:ovsx": "npm run package && echo \"Publish with: npx ovsx publish ../../dist/adb-connect-vscode-<version>.vsix -p <token>\""
   },
   "dependencies": {
     "@adb-connect/core": "*"
   },
   "devDependencies": {
-    "@types/node": "^16.18.0",
+    "@types/node": "^22.0.0",
     "@types/vscode": "~1.85.0",
-    "typescript": "^5.2.2"
+    "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "^4.0.0",
+    "esbuild": "^0.28.0",
+    "typescript": "^5.6.0"
   }
 }

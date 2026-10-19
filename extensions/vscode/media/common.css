@@ -1,0 +1,100 @@
+/* Shared webview styles. Colours come from the active VS Code theme so light, dark and high-contrast all work.
+   Status colours mirror packages/ui-design/tokens.json. */
+:root {
+  --ac-radius: 10px;
+  --ac-radius-sm: 6px;
+  --ac-gap: 12px;
+  --ac-card-bg: var(--vscode-editorWidget-background, var(--vscode-sideBar-background));
+  --ac-border: var(--vscode-widget-border, var(--vscode-panel-border, rgba(128, 128, 128, .35)));
+  --ac-muted: var(--vscode-descriptionForeground);
+  --ac-ok: var(--vscode-testing-iconPassed, #3fb950);
+  --ac-warn: var(--vscode-editorWarning-foreground, #d29922);
+  --ac-err: var(--vscode-errorForeground, #f85149);
+  --ac-accent: var(--vscode-button-background);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 20px clamp(12px, 3vw, 32px) 32px;
+  color: var(--vscode-foreground);
+  background: var(--vscode-editor-background);
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  line-height: 1.45;
+}
+
+h1 { font-size: 1.45em; font-weight: 600; margin: 0; }
+h2 { font-size: 1.05em; font-weight: 600; margin: 24px 0 10px; }
+p { margin: 0; }
+.muted { color: var(--ac-muted); }
+.mono { font-family: var(--vscode-editor-font-family); font-size: .92em; }
+
+button {
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: var(--ac-radius-sm);
+  color: var(--vscode-button-secondaryForeground);
+  background: var(--vscode-button-secondaryBackground);
+  cursor: pointer;
+  white-space: nowrap;
+}
+button:hover { background: var(--vscode-button-secondaryHoverBackground); }
+button.primary { color: var(--vscode-button-foreground); background: var(--vscode-button-background); }
+button.primary:hover { background: var(--vscode-button-hoverBackground); }
+button.link {
+  background: none; border: none; padding: 2px 4px;
+  color: var(--vscode-textLink-foreground);
+}
+button.link:hover { color: var(--vscode-textLink-activeForeground); text-decoration: underline; background: none; }
+button.icon { padding: 5px 7px; background: transparent; color: var(--vscode-icon-foreground); }
+button.icon:hover { background: var(--vscode-toolbar-hoverBackground); }
+button:focus-visible, a:focus-visible, summary:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
+button:disabled { opacity: .5; cursor: default; }
+
+svg.i { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+.card {
+  background: var(--ac-card-bg);
+  border: 1px solid var(--ac-border);
+  border-radius: var(--ac-radius);
+}
+
+.pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: .85em;
+  border: 1px solid var(--ac-border);
+  color: var(--ac-muted);
+  white-space: nowrap;
+}
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.pill.ok { color: var(--ac-ok); border-color: color-mix(in srgb, var(--ac-ok) 45%, transparent); background: color-mix(in srgb, var(--ac-ok) 12%, transparent); }
+.pill.warn { color: var(--ac-warn); border-color: color-mix(in srgb, var(--ac-warn) 45%, transparent); }
+.pill.err { color: var(--ac-err); border-color: color-mix(in srgb, var(--ac-err) 45%, transparent); }
+.pill.plain::before { display: none; }
+
+.spinner {
+  width: 14px; height: 14px; flex: none;
+  border: 2px solid var(--ac-border);
+  border-top-color: var(--vscode-progressBar-background, var(--ac-accent));
+  border-radius: 50%;
+  animation: spin .9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } }
+
+.banner {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 10px 12px; margin: 12px 0;
+  border-radius: var(--ac-radius-sm);
+  border: 1px solid var(--vscode-inputValidation-errorBorder, var(--ac-err));
+  background: var(--vscode-inputValidation-errorBackground, transparent);
+}

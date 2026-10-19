@@ -1,0 +1,224 @@
+{
+  "$comment": "Shared parser test vectors. Consumed by packages/core (TypeScript) and extensions/jetbrains (Kotlin) so both implementations agree. Inputs captured from adb 1.0.41 / platform-tools 37.0.1 unless noted.",
+  "devices": [
+    {
+      "name": "usb devices with header (real capture)",
+      "input": "List of devices attached\nK5J0220408003290       device usb:1245184X product:ELS-N29 model:ELS_NX9 device:HWELS transport_id:87\nYXEMRCGYAI49S4SS       device usb:1310720X product:corot_global model:23078PND5G device:corot transport_id:1\n\n",
+      "expected": [
+        {
+          "serial": "K5J0220408003290",
+          "state": "device",
+          "model": "ELS NX9",
+          "transport": "usb"
+        },
+        {
+          "serial": "YXEMRCGYAI49S4SS",
+          "state": "device",
+          "model": "23078PND5G",
+          "transport": "usb"
+        }
+      ]
+    },
+    {
+      "name": "wifi by ip and by mdns, unauthorized, offline",
+      "input": "List of devices attached\n192.168.1.10:35555     device product:husky model:Pixel_9_Pro device:husky transport_id:3\nadb-35121FDH2000AB-Qz5WvP._adb-tls-connect._tcp device product:shiba model:Pixel_8 device:shiba transport_id:4\nR58N12345AB            unauthorized usb:1-1 transport_id:5\n192.168.1.11:41234     offline transport_id:6\n",
+      "expected": [
+        {
+          "serial": "192.168.1.10:35555",
+          "state": "device",
+          "model": "Pixel 9 Pro",
+          "transport": "wifi",
+          "endpoint": "192.168.1.10:35555"
+        },
+        {
+          "serial": "adb-35121FDH2000AB-Qz5WvP._adb-tls-connect._tcp",
+          "state": "device",
+          "model": "Pixel 8",
+          "transport": "wifi",
+          "mdnsName": "adb-35121FDH2000AB-Qz5WvP"
+        },
+        {
+          "serial": "R58N12345AB",
+          "state": "unauthorized",
+          "model": "R58N12345AB",
+          "transport": "usb"
+        },
+        {
+          "serial": "192.168.1.11:41234",
+          "state": "offline",
+          "model": "192.168.1.11:41234",
+          "transport": "wifi",
+          "endpoint": "192.168.1.11:41234"
+        }
+      ]
+    },
+    {
+      "name": "no permissions with free-text hint, daemon start noise",
+      "input": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\nList of devices attached\n0123456789ABCDEF       no permissions (missing udev rules? user is in the plugdev group); see [http://developer.android.com/tools/device.html] usb:1-2 transport_id:7\n",
+      "expected": [
+        {
+          "serial": "0123456789ABCDEF",
+          "state": "no permissions",
+          "model": "0123456789ABCDEF",
+          "transport": "usb"
+        }
+      ]
+    },
+    {
+      "name": "empty",
+      "input": "List of devices attached\n\n",
+      "expected": []
+    }
+  ],
+  "trackDevicesFrames": [
+    {
+      "name": "two frames, second empty (real framing)",
+      "input": "00d3K5J0220408003290       device usb:1245184X product:ELS-N29 model:ELS_NX9 device:HWELS transport_id:87\nYXEMRCGYAI49S4SS       device usb:1310720X product:corot_global model:23078PND5G device:corot transport_id:1\n0000",
+      "expectedFrames": 2,
+      "expectedDeviceCounts": [
+        2,
+        0
+      ]
+    }
+  ],
+  "mdns": [
+    {
+      "name": "header only (real capture)",
+      "input": "List of discovered mdns services\n\n",
+      "expected": []
+    },
+    {
+      "name": "connect + pairing + legacy + malformed",
+      "input": "List of discovered mdns services\nadb-35121FDH2000AB-Qz5WvP\t_adb-tls-connect._tcp\t192.168.1.10:37123\nadbconnect-k2j4h5g6f7\t_adb-tls-pairing._tcp.\t192.168.1.10:42761\nadb-35121FDH2000AB\t_adb._tcp\t192.168.1.10:5555\nbogus _adb-tls-connect._tcp. not-an-endpoint\n",
+      "expected": [
+        {
+          "name": "adb-35121FDH2000AB-Qz5WvP",
+          "type": "connect",
+          "endpoint": "192.168.1.10:37123"
+        },
+        {
+          "name": "adbconnect-k2j4h5g6f7",
+          "type": "pairing",
+          "endpoint": "192.168.1.10:42761"
+        }
+      ]
+    }
+  ],
+  "pair": [
+    {
+      "input": "Successfully paired to 192.168.1.10:42761 [guid=adb-35121FDH2000AB-Qz5WvP]",
+      "expected": {
+        "ok": true,
+        "endpoint": "192.168.1.10:42761",
+        "guid": "adb-35121FDH2000AB-Qz5WvP"
+      }
+    },
+    {
+      "input": "Successfully paired to 192.168.1.10:42761",
+      "expected": {
+        "ok": true,
+        "endpoint": "192.168.1.10:42761"
+      }
+    },
+    {
+      "input": "Failed: Wrong password or connection was dropped.",
+      "expected": {
+        "ok": false
+      }
+    },
+    {
+      "input": "error: protocol fault (couldn't read status message): Undefined error: 0",
+      "expected": {
+        "ok": false
+      }
+    }
+  ],
+  "connect": [
+    {
+      "input": "connected to 192.168.1.10:37123",
+      "expected": {
+        "ok": true,
+        "already": false
+      }
+    },
+    {
+      "input": "already connected to 192.168.1.10:37123",
+      "expected": {
+        "ok": true,
+        "already": true
+      }
+    },
+    {
+      "input": "failed to connect to '192.168.21.91:5555': No route to host",
+      "expected": {
+        "ok": false,
+        "already": false
+      }
+    },
+    {
+      "input": "failed to authenticate to 192.168.1.10:37123",
+      "expected": {
+        "ok": false,
+        "already": false
+      }
+    },
+    {
+      "input": "cannot connect to 192.168.1.10:37123: Connection refused",
+      "expected": {
+        "ok": false,
+        "already": false
+      }
+    }
+  ],
+  "version": [
+    {
+      "input": "Android Debug Bridge version 1.0.41\nVersion 37.0.1-15733141\nInstalled as /usr/local/bin/adb\nRunning on Darwin 27.0.0 (arm64)",
+      "expected": {
+        "adb": "1.0.41",
+        "platformTools": "37.0.1",
+        "wirelessPairing": true
+      }
+    },
+    {
+      "input": "Android Debug Bridge version 1.0.41\nVersion 30.0.5-6877874\n",
+      "expected": {
+        "adb": "1.0.41",
+        "platformTools": "30.0.5",
+        "wirelessPairing": false
+      }
+    },
+    {
+      "input": "Android Debug Bridge version 1.0.39\nRevision 3db08f2c6889-android\n",
+      "expected": {
+        "adb": "1.0.39",
+        "wirelessPairing": false
+      }
+    }
+  ],
+  "endpoints": {
+    "valid": [
+      "192.168.1.50:37123",
+      "10.0.0.2:5555",
+      "pixel.local:5555",
+      "[fe80::1%wlan0]:5555",
+      "[::1]:5037"
+    ],
+    "invalid": [
+      "abc;rm -rf /:4",
+      "host:99999",
+      "host:0",
+      "192.168.1.50",
+      "-oProxy:5555",
+      "",
+      "192.168.1.50:37123 extra",
+      "[not-ipv6]:5555"
+    ]
+  },
+  "qr": {
+    "credentials": {
+      "serviceName": "adbconnect-k2j4h5g6f7",
+      "password": "Xy7Kp2Qm9Lw3"
+    },
+    "payload": "WIFI:T:ADB;S:adbconnect-k2j4h5g6f7;P:Xy7Kp2Qm9Lw3;;"
+  }
+}

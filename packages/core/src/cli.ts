@@ -1,41 +1,35 @@
 #!/usr/bin/env node
-import path from 'path';
-import { findAdb, adbVersion, listDevices } from './adb';
+import { findAdb, adbVersion, listDevices, connect, disconnect, discover } from './adb';
+
+function print(obj: unknown): never {
+  console.log(JSON.stringify(obj));
+  process.exit(0);
+}
 
 async function main() {
-  const cmd = process.argv[2] || 'status';
-  if (cmd === 'version') {
-    const adb = await findAdb();
-    if (!adb) {
-      console.log(JSON.stringify({ ok: false, error: 'adb-not-found' }));
-      process.exit(0);
-    }
-    const v = await adbVersion(adb);
-    console.log(JSON.stringify({ ok: true, adbPath: adb, version: v }));
-    process.exit(0);
-  }
-
-  if (cmd === 'list-devices') {
-    const adb = await findAdb();
-    if (!adb) {
-      console.log(JSON.stringify({ ok: false, error: 'adb-not-found' }));
-      process.exit(0);
-    }
-    const r = await listDevices(adb);
-    console.log(JSON.stringify(Object.assign({ adbPath: adb }, r)));
-    process.exit(0);
-  }
-
-  // default: status
+  const [cmd = 'status', arg] = process.argv.slice(2);
   const adb = await findAdb();
-  if (!adb) {
-    console.log(JSON.stringify({ ok: false, status: 'adb-not-found' }));
-    process.exit(0);
+  if (!adb) print({ ok: false, error: 'adb-not-found' });
+
+  switch (cmd) {
+    case 'version':
+      print({ ok: true, adbPath: adb, version: await adbVersion(adb) });
+    case 'list-devices':
+      print({ adbPath: adb, ...(await listDevices(adb)) });
+    case 'discover':
+      print(await discover(adb));
+    case 'connect':
+      print(await connect(adb, arg ?? ''));
+    case 'disconnect':
+      print(await disconnect(adb, arg ?? ''));
+    case 'status': {
+      const v = await adbVersion(adb);
+      const d = await listDevices(adb);
+      print({ ok: true, adbPath: adb, version: v, devices: d.devices });
+    }
+    default:
+      print({ ok: false, error: `unknown-command: ${cmd}` });
   }
-  const v = await adbVersion(adb);
-  const d = await listDevices(adb);
-  console.log(JSON.stringify({ ok: true, adbPath: adb, version: v, devices: d.devices || [] }));
-  process.exit(0);
 }
 
 main().catch(err => {

@@ -8,7 +8,8 @@
     "extensions/*"
   ],
   "scripts": {
-    "build": "npx -w packages/core npm run build && npx -w extensions/vscode npm run build",
+    "build": "npm run -w packages/core build && npm run -w extensions/vscode build",
+    "test": "npm run -w packages/core test",
     "bootstrap": "npm install"
   }
 }

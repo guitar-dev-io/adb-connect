@@ -7,29 +7,26 @@ Goals
 - Provide IDE integrations for VS Code (and compatibles) and JetBrains platforms.
 - Implement QR pairing, six-digit pairing, discovery, connect/disconnect, and smart auto-reconnect while respecting user consent.
 
-This initial commit scaffolds the monorepo and implements a minimal working core CLI that:
-- Detects the adb executable on PATH
-- Reports adb version
-- Lists connected devices (via `adb devices -l`)
-
-It also includes a minimal VS Code extension skeleton that shows a status bar item and calls the core CLI.
+What works today
+- `packages/core`: TypeScript ADB engine (library + JSON CLI) — device listing, code pairing, connect/disconnect, mDNS discovery, input validation
+- `extensions/vscode`: status bar, quick actions, device manager webview, pairing code flow, discovery, auto-reconnect to remembered endpoints, settings
+- `reference/adb-connect-cross-ide`: the original JS developer-preview this code was ported from (plus the JetBrains scaffold), kept for reference
 
 Development workflow
-1. Install dependencies at repo root (npm 8+ or pnpm):
-   - npm install
-   - npm run -w packages/core build
-   - npm run -w extensions/vscode build
-2. In development, build core and the extension and run the extension in the Extension Development Host from VS Code.
+1. `npm install` at the repo root (npm workspaces)
+2. `npm run build` — builds core, then the extension
+3. `npm test` — core parser/validation tests
+4. Open the repo in VS Code and run the extension in an Extension Development Host (extension path `extensions/vscode`)
 
 Next steps
-- Implement discovery of _adb-tls-pairing._tcp and _adb-tls-connect._tcp
-- Implement secure QR pairing and six-digit pairing flows
-- Add JetBrains plugin skeleton and IPC strategy between TypeScript and Kotlin
-- Add tests and CI workflows
+- Real QR pairing (pairing server + `_adb-tls-pairing._tcp` advertisement)
+- Bundle core into the VSIX (esbuild) and publish metadata
+- JetBrains plugin using the core CLI or a Kotlin port
+- VS Code integration tests
 
 See packages/core/README.md and extensions/vscode/README.md for more details.
 
 
 ## Phases
 Phase 1: Completed — repository scaffold and basic core CLI + VS Code extension skeleton.
-Phase 2+: Implementing features incrementally (I'll proceed with Phase 2 next unless you want a different priority).
+Phase 2: Completed — ported pairing, discovery, connect/reconnect/disconnect, device manager and settings from the reference project to TypeScript.

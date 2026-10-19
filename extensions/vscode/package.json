@@ -1,17 +1,50 @@
 {
   "name": "adb-connect-vscode",
-  "displayName": "ADB Connect",
+  "displayName": "ADB Connect - Wireless Android Debugging",
+  "description": "Connect Android devices wirelessly from your IDE with pairing code, discovery, device manager and smart reconnect.",
   "publisher": "guitar-dev-io",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "license": "MIT",
   "engines": {
-    "vscode": "^1.60.0"
+    "vscode": "^1.85.0"
   },
+  "categories": ["Other", "Debuggers"],
+  "keywords": ["adb", "android", "wireless debugging", "pair", "device", "flutter"],
   "main": "./dist/extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "contributes": {
+    "commands": [
+      { "command": "adbConnect.menu", "title": "ADB Connect: Quick Actions" },
+      { "command": "adbConnect.devices", "title": "ADB Connect: Device Manager" },
+      { "command": "adbConnect.pairCode", "title": "ADB Connect: Pair with 6-digit Code" },
+      { "command": "adbConnect.pairQr", "title": "ADB Connect: Pair via QR (Guide)" },
+      { "command": "adbConnect.connect", "title": "ADB Connect: Connect by IP:Port" },
+      { "command": "adbConnect.discover", "title": "ADB Connect: Discover Devices" },
+      { "command": "adbConnect.reconnect", "title": "ADB Connect: Reconnect Known Devices" },
+      { "command": "adbConnect.disconnect", "title": "ADB Connect: Disconnect Device" },
+      { "command": "adbConnect.logs", "title": "ADB Connect: Show Logs" }
+    ],
+    "configuration": {
+      "title": "ADB Connect",
+      "properties": {
+        "adbConnect.adbPath": { "type": "string", "default": "adb", "scope": "machine", "description": "Path to adb executable. Uses system PATH by default." },
+        "adbConnect.autoReconnect": { "type": "boolean", "default": true, "description": "On IDE startup, reconnect only to device endpoints you connected to before." },
+        "adbConnect.showStatusBar": { "type": "boolean", "default": true, "description": "Show ADB Connect in the status bar." },
+        "adbConnect.refreshIntervalSeconds": { "type": "number", "default": 15, "minimum": 5, "maximum": 300, "description": "Device status refresh interval in seconds." },
+        "adbConnect.knownEndpoints": { "type": "array", "items": { "type": "string" }, "default": [], "scope": "application", "description": "Wireless host:port endpoints remembered after a successful connect. Removed on manual disconnect. Not secret." }
+      }
+    }
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "watch": "tsc -w -p tsconfig.json"
+  },
+  "dependencies": {
+    "@adb-connect/core": "*"
   },
   "devDependencies": {
-    "typescript": "^5.2.2",
-    "@types/vscode": "^1.60.0"
+    "@types/node": "^16.18.0",
+    "@types/vscode": "~1.85.0",
+    "typescript": "^5.2.2"
   }
 }

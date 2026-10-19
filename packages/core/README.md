@@ -1,12 +1,17 @@
 # @adb-connect/core
 
-A minimal Node TypeScript core for interacting with adb. Exposes a small CLI used by IDE integrations during development.
+Node/TypeScript core for talking to the locally installed `adb`. Used as a library by the VS Code extension, and exposes a small JSON CLI for other integrations (e.g. JetBrains) during development.
 
-Commands
-- status (default) — reports adb path, version and device list
-- version — reports adb version
-- list-devices — lists connected devices
+Library (`import ... from '@adb-connect/core'`)
+- `runAdb(adbPath, args, timeoutMs)` — spawn adb without a shell, bounded output and timeout
+- `listDevices`, `pair`, `connect`, `disconnect`, `discover` — high-level operations; inputs are validated and pairing codes never appear in returned messages
+- `parseDevices`, `parseMdns`, `validEndpoint`, `validPairingCode` — pure helpers
 
-Build
-- npm run build
+CLI (`node dist/cli.js <command>`, prints JSON)
+- `status` (default) — adb path, version and device list
+- `version`, `list-devices`, `discover`
+- `connect <host:port>`, `disconnect <host:port>`
 
+Build / test
+- `npm run build`
+- `npm test`

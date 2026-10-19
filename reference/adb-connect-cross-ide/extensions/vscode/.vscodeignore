@@ -1,0 +1,4 @@
+.github/**
+test/**
+*.vsix
+node_modules/**

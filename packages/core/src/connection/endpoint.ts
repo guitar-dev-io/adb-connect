@@ -19,7 +19,9 @@ export function parseEndpoint(value: unknown): Endpoint | null {
   if (host.startsWith('[')) {
     return net.isIP(host.slice(1, -1).split('%')[0]) === 6 ? { host, port } : null;
   }
-  return net.isIP(host) === 4 || HOSTNAME_RE.test(host) ? { host, port } : null;
+  // All-numeric hosts must be real IPv4 ("999.1.1.1" is not a hostname).
+  if (/^[\d.]+$/.test(host)) return net.isIP(host) === 4 ? { host, port } : null;
+  return HOSTNAME_RE.test(host) ? { host, port } : null;
 }
 
 export function validEndpoint(value: unknown): boolean {

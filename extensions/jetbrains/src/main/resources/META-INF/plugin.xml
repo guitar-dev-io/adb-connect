@@ -1,0 +1,49 @@
+<idea-plugin>
+  <id>dev.adbconnect.wireless</id>
+  <name>ADB Connect - Wireless Android Debugging</name>
+  <!-- TODO before publishing: replace with your JetBrains Marketplace vendor profile. -->
+  <vendor url="https://github.com/guitar-dev-io/adb-connect">guitar-dev-io</vendor>
+
+  <description><![CDATA[
+    <p>Pair and connect Android devices over Wi-Fi without typing adb commands.</p>
+    <ul>
+      <li><b>Pair via QR Code</b> — the real Android Wireless Debugging QR flow (Android 11+).</li>
+      <li><b>Pair via pairing code</b> — the phone's pairing endpoint is discovered automatically.</li>
+      <li><b>Discover</b> devices advertising Wireless debugging (mDNS through the adb server).</li>
+      <li><b>Status bar</b> device state, <b>quick actions</b> and an <b>ADB Connect tool window</b> device manager.</li>
+      <li><b>Smart reconnect</b>: only devices you approved, only while they advertise, never after you disconnect.</li>
+    </ul>
+    <p>Uses your local Android SDK Platform-Tools <code>adb</code>. No accounts, telemetry or cloud services.</p>
+  ]]></description>
+
+  <depends>com.intellij.modules.platform</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationService serviceImplementation="dev.adbconnect.ide.AdbConnectSettings"/>
+    <applicationService serviceImplementation="dev.adbconnect.ide.AdbConnectService"/>
+    <statusBarWidgetFactory id="AdbConnectStatus" implementation="dev.adbconnect.ide.AdbStatusBarWidgetFactory" order="first"/>
+    <toolWindow id="ADB Connect" anchor="right" icon="/icons/toolWindow.svg" factoryClass="dev.adbconnect.ide.AdbToolWindowFactory"/>
+    <applicationConfigurable parentId="tools" instance="dev.adbconnect.ide.AdbConnectConfigurable" id="dev.adbconnect.settings" displayName="ADB Connect"/>
+    <notificationGroup id="ADB Connect" displayType="BALLOON"/>
+    <postStartupActivity implementation="dev.adbconnect.ide.AdbStartupActivity"/>
+  </extensions>
+
+  <actions>
+    <group id="AdbConnect.Group" text="ADB Connect" popup="true" icon="/icons/toolWindow.svg">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+      <action id="AdbConnect.QuickActions" class="dev.adbconnect.ide.QuickActionsAction" text="Quick Actions…"/>
+      <separator/>
+      <action id="AdbConnect.Connect" class="dev.adbconnect.ide.ConnectAction" text="Connect Device" description="Connect to a discovered or remembered device, or by IP:Port" icon="AllIcons.Nodes.Plugin"/>
+      <action id="AdbConnect.Reconnect" class="dev.adbconnect.ide.ReconnectAction" text="Reconnect" description="Reconnect remembered devices" icon="AllIcons.Actions.Refresh"/>
+      <action id="AdbConnect.Disconnect" class="dev.adbconnect.ide.DisconnectAction" text="Disconnect" description="Disconnect a wireless device" icon="AllIcons.Actions.Suspend"/>
+      <separator/>
+      <action id="AdbConnect.PairQr" class="dev.adbconnect.ide.PairQrAction" text="Pair via QR Code" description="Pair a new Android 11+ device by scanning a QR code" icon="/icons/qr.svg"/>
+      <action id="AdbConnect.PairCode" class="dev.adbconnect.ide.PairCodeAction" text="Pair via Pairing Code" description="Pair a new device with its six-digit Wi-Fi pairing code" icon="AllIcons.Nodes.SecurityRole"/>
+      <action id="AdbConnect.Discover" class="dev.adbconnect.ide.DiscoverAction" text="Discover Devices" description="Find devices advertising Wireless debugging" icon="AllIcons.Actions.Search"/>
+      <separator/>
+      <action id="AdbConnect.ManageDevices" class="dev.adbconnect.ide.ManageDevicesAction" text="Manage Devices" description="Open the ADB Connect device manager" icon="AllIcons.Actions.ListFiles"/>
+      <action id="AdbConnect.Settings" class="dev.adbconnect.ide.SettingsAction" text="Settings" description="ADB Connect settings" icon="AllIcons.General.Settings"/>
+      <action id="AdbConnect.ViewLogs" class="dev.adbconnect.ide.ViewLogsAction" text="View Logs" description="Show the ADB Connect log" icon="AllIcons.Debugger.Console"/>
+    </group>
+  </actions>
+</idea-plugin>

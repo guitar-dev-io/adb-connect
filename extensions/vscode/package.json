@@ -1,0 +1,17 @@
+{
+  "name": "adb-connect-vscode",
+  "displayName": "ADB Connect",
+  "publisher": "guitar-dev-io",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "main": "./dist/extension.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "@types/vscode": "^1.60.0"
+  }
+}

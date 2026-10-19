@@ -1,0 +1,13 @@
+{
+  "name": "@adb-connect/core",
+  "version": "0.0.1",
+  "main": "dist/cli.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/cli.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}

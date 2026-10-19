@@ -1,0 +1,14 @@
+{
+  "name": "adb-connect",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Monorepo for ADB Connect — cross-IDE wireless debugging",
+  "workspaces": [
+    "packages/*",
+    "extensions/*"
+  ],
+  "scripts": {
+    "build": "npx -w packages/core npm run build && npx -w extensions/vscode npm run build",
+    "bootstrap": "npm install"
+  }
+}

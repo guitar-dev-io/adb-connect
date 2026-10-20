@@ -12,26 +12,47 @@ Pick the channel that matches your IDE.
 
 ## VS Code — VS Code Marketplace
 
-1. Open the Extensions view (`Ctrl+Shift+X` / `Cmd+Shift+X`).
-2. Search for **ADB Connect**.
-3. Click **Install**.
+In the editor:
 
-Or from the command line:
+1. Open the **Extensions** view — click the Extensions icon in the Activity Bar, or press
+   `Ctrl+Shift+X` (Windows/Linux) / `Cmd+Shift+X` (macOS).
+2. In the search box at the top, type one of these:
+   - `ADB Connect` — the display name.
+   - `adb wireless` or `wireless debugging` — if several results appear, look for the one
+     published by **guitar-dev-io**.
+   - `guitar-dev-io.adb-connect-vscode` — the exact id, to jump straight to it.
+3. Click **ADB Connect — Wireless Android Debugging** in the results.
+4. Click the blue **Install** button.
+5. After it installs, an **ADB** item appears in the status bar (bottom of the window) —
+   click it to open Quick Actions.
+
+Or install from the command line:
 
 ```sh
 code --install-extension guitar-dev-io.adb-connect-vscode
 ```
 
-> `guitar-dev-io` is a placeholder publisher id; use the real Marketplace id once
-> published.
+You can also open the Marketplace page directly in a browser and click **Install**:
+<https://marketplace.visualstudio.com/items?itemName=guitar-dev-io.adb-connect-vscode>
+
+> **Can't find it by searching?** Right after a new release the Marketplace can take a few
+> minutes to index. Meanwhile, search by the exact id
+> `guitar-dev-io.adb-connect-vscode`, open the Marketplace link above, or install from a
+> `.vsix` (see below).
 
 ## Kiro, Cursor, Windsurf and other VS Code-based IDEs — Open VSX
 
-These IDEs install extensions from the [Open VSX Registry](https://open-vsx.org):
+These IDEs install extensions from the [Open VSX Registry](https://open-vsx.org) instead of
+the VS Code Marketplace:
 
-1. Open the Extensions view in the IDE.
-2. Search for **ADB Connect** (the IDE is wired to Open VSX).
-3. Click **Install**.
+1. Open the **Extensions** view in the IDE (`Ctrl+Shift+X` / `Cmd+Shift+X`).
+2. In the search box, type `ADB Connect` (or the exact id
+   `guitar-dev-io.adb-connect-vscode`). These IDEs are wired to Open VSX, so the search
+   runs against that registry.
+3. Click the result, then click **Install**.
+
+> If it doesn't show up, the extension may not be published to Open VSX yet — install from
+> a `.vsix` (below) in the meantime.
 
 ## Install from VSIX (any compatible IDE)
 
@@ -40,10 +61,10 @@ Use a `.vsix` when you build locally or install a specific release.
 From the command line:
 
 ```sh
-code --install-extension adb-connect-vscode-0.2.0.vsix
+code --install-extension adb-connect-vscode-<version>.vsix
 ```
 
-(Replace `code` with your IDE's CLI, e.g. `cursor` / `windsurf`, if available.)
+(Replace `code` with your IDE's CLI, e.g. `cursor` / `windsurf` / `kiro`, if available.)
 
 Or via the UI: Extensions view › `...` menu › **Install from VSIX...** › pick the file.
 
@@ -56,7 +77,7 @@ npm install
 npm run -w extensions/vscode package
 ```
 
-This produces `dist/adb-connect-vscode-0.2.0.vsix` at the repo root.
+This produces `dist/adb-connect-vscode-<version>.vsix` at the repo root.
 
 ## Publishing (maintainers)
 

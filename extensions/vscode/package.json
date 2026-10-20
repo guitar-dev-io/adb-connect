@@ -2,7 +2,7 @@
   "name": "adb-connect-vscode",
   "displayName": "ADB Connect — Wireless Android Debugging",
   "description": "Wireless Android debugging over Wi-Fi — no USB cable. One-click ADB pairing and connect: real QR pairing, six-digit code pairing, mDNS discovery, device manager and smart auto-reconnect.",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "publisher": "guitar-dev-io",
   "license": "MIT",
   "icon": "media/icon.png",

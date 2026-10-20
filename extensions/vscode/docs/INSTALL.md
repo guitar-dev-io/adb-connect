@@ -33,8 +33,6 @@ These IDEs install extensions from the [Open VSX Registry](https://open-vsx.org)
 2. Search for **ADB Connect** (the IDE is wired to Open VSX).
 3. Click **Install**.
 
-JetBrains IDEs are not supported by this package.
-
 ## Install from VSIX (any compatible IDE)
 
 Use a `.vsix` when you build locally or install a specific release.

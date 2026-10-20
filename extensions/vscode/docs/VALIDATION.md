@@ -159,8 +159,8 @@ cross-platform path/SDK resolution. Full tri-platform CI runs validate the rest.
 
 ### 16. JetBrains compatibility
 
-**Status:** N/A — the JetBrains plugin is out of scope for this VS Code package. See the
-separate JetBrains module.
+**Status:** N/A — this release ships a VS Code extension only; there is no JetBrains plugin
+in this version, so JetBrains compatibility does not apply.
 
 ### 17. Light and dark themes
 

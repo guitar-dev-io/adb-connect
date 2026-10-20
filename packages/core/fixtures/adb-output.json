@@ -1,5 +1,5 @@
 {
-  "$comment": "Shared parser test vectors. Consumed by packages/core (TypeScript) and extensions/jetbrains (Kotlin) so both implementations agree. Inputs captured from adb 1.0.41 / platform-tools 37.0.1 unless noted.",
+  "$comment": "Shared parser test vectors for packages/core (TypeScript). Inputs captured from adb 1.0.41 / platform-tools 37.0.1 unless noted.",
   "devices": [
     {
       "name": "usb devices with header (real capture)",
@@ -101,10 +101,7 @@
       "name": "two frames, second empty (real framing)",
       "input": "00d3K5J0220408003290       device usb:1245184X product:ELS-N29 model:ELS_NX9 device:HWELS transport_id:87\nYXEMRCGYAI49S4SS       device usb:1310720X product:corot_global model:23078PND5G device:corot transport_id:1\n0000",
       "expectedFrames": 2,
-      "expectedDeviceCounts": [
-        2,
-        0
-      ]
+      "expectedDeviceCounts": [2, 0]
     }
   ],
   "mdns": [

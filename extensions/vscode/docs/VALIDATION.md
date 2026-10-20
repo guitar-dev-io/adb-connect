@@ -27,8 +27,8 @@ ADB Connect is a VS Code extension and runs on VS Code and compatible VS Code-ba
 | Other VS Code-based IDEs | Open VSX / VSIX     |
 
 All `vscode.*` APIs used by the extension target the `^1.85.0` engine and are available
-across these hosts. JetBrains IDEs are **out of scope** for this package (scenario #16 is
-intentionally excluded — see below).
+across these hosts. This release ships a VS Code extension only; there is no JetBrains
+plugin in this version, so scenario #16 does not apply (see below).
 
 ## Scenarios
 

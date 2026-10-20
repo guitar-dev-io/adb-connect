@@ -1,0 +1,31 @@
+{
+  "id": "FEAT-004",
+  "type": "chore",
+  "description": "Phase 8 (packaging) + FINAL CLEANUP: remove the stray root dist FILE so vsce can create the dist/ directory, package the self-contained VSIX for VS Code + Open VSX, then (only after all prior features verified) preserve ui-reference.png into docs/ui and delete ref.md and reference/adb-connect-cross-ide/. Depends on FEAT-001, FEAT-002, FEAT-003 (needs green code/tests, the screenshots, and the docs in place). This feature finishes last.",
+  "status": "completed",
+  "steps": [
+    "Confirm the repo-root path `dist` is an untracked FILE (git ls-files dist is empty; file dist => Zip archive) and delete it with `rm -f dist`. This old .vsix-as-a-file blocks `vsce package --out ../../dist/` (ENOTDIR). Do not touch the gitignored packages/*/dist or extensions/vscode/dist build outputs.",
+    "Run `npm run -w extensions/vscode package` and confirm it writes dist/adb-connect-vscode-0.2.0.vsix. Confirm the VSIX is self-contained: `unzip -p dist/adb-connect-vscode-0.2.0.vsix extension/dist/extension.js | grep -c 'require(\"@adb-connect/core\")'` prints 0 and the same for qrcode (baseline exploration already showed 0 for both).",
+    "Run `npm run -w extensions/vscode package:ovsx` and confirm it completes `package` and prints the `ovsx publish ... -p <token>` instruction (Open VSX path for Kiro/Cursor/Windsurf). Do not actually publish and do not add real tokens.",
+    "FINAL CLEANUP — only after FEAT-001..003 are completed and the build/tests above are green: copy reference/adb-connect-cross-ide/ui-reference.png to extensions/vscode/docs/ui/ui-reference.png (design-of-record so README/VALIDATION keep the reference). Then grep the source (extensions, packages) for 'ref.md' and 'reference/adb-connect-cross-ide' and confirm nothing in shipped code references those paths.",
+    "Delete ref.md and the entire reference/adb-connect-cross-ide/ directory (this includes the untracked reference/adb-connect-cross-ide/extensions/jetbrains/.gradle/ which lives INSIDE the reference tree — that is fine and is NOT the real extensions/jetbrains/, which must remain untouched).",
+    "Run the full fail-closed verification pass from repo root one more time: npm run build; npm test; npm run -w extensions/vscode test:unit; npm run -w extensions/vscode test:integration (or NOT RUN with reason); npm run -w extensions/vscode package. Record in findings what passed, what is NOT VERIFIED (real-device QR), and the .vsix path."
+  ],
+  "acceptance_criteria": [
+    "The stray root `dist` file is gone and `npm run -w extensions/vscode package` produces dist/adb-connect-vscode-0.2.0.vsix.",
+    "The packaged extension/dist/extension.js does not require @adb-connect/core or qrcode at runtime (grep count 0).",
+    "package:ovsx completes and prints the Open VSX publish instruction.",
+    "ref.md and reference/adb-connect-cross-ide/ are deleted; ui-reference.png is preserved at extensions/vscode/docs/ui/ui-reference.png; extensions/jetbrains/ is untouched.",
+    "After cleanup, npm run build, npm test, and npm run -w extensions/vscode test:unit all still pass and no shipped source references the deleted paths."
+  ],
+  "verification": [
+    "npm run build",
+    "npm test",
+    "npm run -w extensions/vscode test:unit",
+    "npm run -w extensions/vscode package (produces dist/*.vsix)",
+    "npm run -w extensions/vscode test:integration (run if sandbox allows; else NOT RUN with reason)",
+    "grep -rn 'reference/adb-connect-cross-ide\\|ref\\.md' extensions packages returns no shipped-source references"
+  ],
+  "blocked_reason": null,
+  "findings": "PASSED: (1) stray untracked root `dist` zip FILE confirmed (git ls-files dist empty; `file dist` => Zip archive) and deleted. vsce's `--out ../../dist/` recreates a FILE named dist and then ENOTDIRs on the trailing-slash stat, so the repo-root `dist/` directory was created (mkdir -p dist) to receive the VSIX. (2) `npm run -w extensions/vscode package` produced dist/adb-connect-vscode-0.2.0.vsix (15 files, 81.88 KB). Self-contained: grep of bundled extension/dist/extension.js for require(\"@adb-connect/core\")==0 and require(\"qrcode\")==0. (3) `npm run -w extensions/vscode package:ovsx` completed and printed the Open VSX publish instruction `npx ovsx publish ../../dist/adb-connect-vscode-<version>.vsix -p <token>` (NOT published; no real token). (4) ui-reference.png preserved to extensions/vscode/docs/ui/ui-reference.png; grep of `extensions packages` for 'reference/adb-connect-cross-ide' and 'ref.md' returned no matches. (5) ref.md and reference/adb-connect-cross-ide/ deleted (incl. its internal .../extensions/jetbrains/.gradle/ reference copy); the now-empty reference/ parent removed; the real extensions/jetbrains/ left untouched. FINAL FAIL-CLOSED PASS (repo root): npm run build PASS; npm test PASS (48/48, up from baseline 40 after FEAT-002 added diagnose+system tests); npm run -w extensions/vscode test:unit PASS (4/4); npm run -w extensions/vscode test:integration PASS (7/7 via @vscode/test-electron against the fake adb harness — it did run in this environment); npm run -w extensions/vscode package PASS producing the VSIX again. NOT VERIFIED: real-device QR pairing (no physical Android device available). VSIX path: dist/adb-connect-vscode-0.2.0.vsix."
+}

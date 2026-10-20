@@ -1,4 +1,5 @@
 import { validEndpoint } from '../connection/endpoint';
+import { normalizeServiceName } from '../discovery/parse';
 
 export type DeviceState =
   | 'device'
@@ -29,8 +30,9 @@ export interface Device {
 }
 
 const STATES = 'device|offline|unauthorized|authorizing|connecting|recovery|rescue|sideload|bootloader|host|no permissions';
-const LINE_RE = new RegExp(`^(\\S+)\\s+(${STATES})(?:\\s+(.*))?$`);
-const MDNS_SERIAL_RE = /^(adb-[^.\s]+)\._adb-tls-connect\._tcp\.?$/;
+// Serials can contain spaces: mDNS conflict renames give "adb-XXX-yyy (2)._adb-tls-connect._tcp".
+const LINE_RE = new RegExp(`^(.+?)\\s+(${STATES})(?:\\s+(.*))?$`);
+const MDNS_SERIAL_RE = /^(adb-.+?)\._adb-tls-connect\._tcp\.?$/;
 
 export function parseDeviceLine(line: string): Device | null {
   const m = line.trim().match(LINE_RE);
@@ -50,7 +52,7 @@ export function parseDeviceLine(line: string): Device | null {
     model: (attrs.model ?? attrs.device ?? serial).replace(/_/g, ' '),
     transport: endpoint || mdns ? 'wifi' : 'usb',
     endpoint,
-    mdnsName: mdns?.[1],
+    mdnsName: mdns ? normalizeServiceName(mdns[1]) : undefined,
     attrs,
   };
 }

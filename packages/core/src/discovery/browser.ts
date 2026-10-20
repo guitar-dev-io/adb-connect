@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import { AdbClient } from '../adb/client';
 import { MdnsService, serviceKey } from './parse';
+import { SystemMdns, mergeServices } from './system';
 import { Logger, nullLogger } from '../log';
 
 export interface MdnsBrowserOptions {
@@ -9,6 +10,8 @@ export interface MdnsBrowserOptions {
   intervalMs?: number;
   /** Cap for the interval after repeated failures. Default 60s. */
   maxIntervalMs?: number;
+  /** Also browse with the OS resolver (dns-sd / avahi). Default true. */
+  systemResolver?: boolean;
 }
 
 export interface MdnsBrowserEvents {
@@ -42,12 +45,18 @@ export class MdnsBrowser extends EventEmitter {
   private readonly logger: Logger;
   private readonly interval: number;
   private readonly maxInterval: number;
+  private readonly system?: SystemMdns;
+  private fromAdb: MdnsService[] = [];
 
   constructor(private readonly client: AdbClient, opts: MdnsBrowserOptions = {}) {
     super();
     this.logger = opts.logger ?? nullLogger;
     this.interval = opts.intervalMs ?? 3_000;
     this.maxInterval = opts.maxIntervalMs ?? 60_000;
+    if (opts.systemResolver !== false) {
+      const sys = new SystemMdns(() => this.apply(mergeServices(this.fromAdb, sys.list)), { logger: this.logger });
+      if (sys.supported) this.system = sys;
+    }
   }
 
   get services(): MdnsService[] {
@@ -61,7 +70,10 @@ export class MdnsBrowser extends EventEmitter {
   /** Start (or keep) browsing until the returned lease is disposed. */
   acquire(): Lease {
     this.leases++;
-    if (this.leases === 1) this.schedule(0);
+    if (this.leases === 1) {
+      this.system?.start();
+      this.schedule(0);
+    }
     let disposed = false;
     return {
       dispose: () => {
@@ -71,6 +83,7 @@ export class MdnsBrowser extends EventEmitter {
         if (this.leases === 0) {
           clearTimeout(this.timer);
           this.timer = undefined;
+          this.system?.stop();
         }
       },
     };
@@ -119,6 +132,7 @@ export class MdnsBrowser extends EventEmitter {
   }
 
   dispose(): void {
+    this.system?.stop();
     this.leases = 0;
     clearTimeout(this.timer);
     this.timer = undefined;
@@ -143,9 +157,9 @@ export class MdnsBrowser extends EventEmitter {
     this.inFlight = true;
     this.pending = (async () => {
       try {
-        const list = await this.client.mdnsServices();
+        this.fromAdb = await this.client.mdnsServices();
         this.failures = 0;
-        this.apply(list);
+        this.apply(mergeServices(this.fromAdb, this.system?.list ?? []));
       } catch (e) {
         this.failures++;
         const msg = (e as Error).message;

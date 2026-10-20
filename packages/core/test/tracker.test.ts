@@ -34,7 +34,7 @@ test('DeviceTracker: event-driven updates, multiple devices, adb server restart 
 
 test('MdnsBrowser: polls only while leased, no overlapping polls, added/removed diff', async () => {
   const fake = makeFake({ mdns: ['adb-A-1\t_adb-tls-connect._tcp\t192.168.1.10:4000'], delayMs: { mdns: 60 } });
-  const browser = new MdnsBrowser(fake.client, { intervalMs: 20 });
+  const browser = new MdnsBrowser(fake.client, { intervalMs: 20, systemResolver: false });
   const added: string[] = [];
   const removed: string[] = [];
   browser.on('added', s => added.push(s.name));

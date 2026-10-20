@@ -6,6 +6,7 @@ import { parseMdns, MdnsService } from '../discovery/parse';
 import { parsePairOutput, parseConnectOutput, PairOutcome } from '../pairing/parse';
 import { validEndpoint, validPairingCode } from '../connection/endpoint';
 import { Logger, nullLogger } from '../log';
+import { diagnoseUnreachable } from './diagnose';
 
 export interface OpResult {
   ok: boolean;
@@ -87,7 +88,12 @@ export class AdbClient {
     if (!validEndpoint(endpoint)) return { ok: false, message: 'Invalid pairing host:port' };
     if (!secret || /[\s;]/.test(secret)) return { ok: false, message: 'Invalid pairing secret' };
     const r = await this.runner.run(['pair', endpoint, secret], { timeoutMs: 30_000, ...opts, secrets: [secret] });
-    return parsePairOutput(r.text);
+    const out = parsePairOutput(r.text);
+    if (!out.ok) {
+      const hint = await diagnoseUnreachable(endpoint, r.text);
+      if (hint) return { ...out, message: `${out.message}\n${hint}` };
+    }
+    return out;
   }
 
   async pairWithCode(endpoint: string, code: string, opts?: RunOptions): Promise<PairOutcome> {
@@ -98,12 +104,18 @@ export class AdbClient {
   async connect(endpoint: string, opts?: RunOptions): Promise<OpResult & { already: boolean }> {
     if (!validEndpoint(endpoint)) return { ok: false, already: false, message: 'Invalid host:port' };
     const r = await this.runner.run(['connect', endpoint], { timeoutMs: 15_000, ...opts });
-    return parseConnectOutput(r.text);
+    const out = parseConnectOutput(r.text);
+    if (!out.ok) {
+      const hint = await diagnoseUnreachable(endpoint, r.text);
+      if (hint) return { ...out, message: `${out.message}\n${hint}` };
+    }
+    return out;
   }
 
   /** Disconnect one wireless transport. Never used with no argument (that would drop every device). */
   async disconnect(serial: string, opts?: RunOptions): Promise<OpResult> {
-    if (!serial || serial.startsWith('-') || /\s/.test(serial)) return { ok: false, message: 'Invalid device serial' };
+    // No shell is involved, so spaces (mDNS renames) are fine; reject flags and control characters.
+    if (!serial || serial.startsWith('-') || /[\x00-\x1f]/.test(serial)) return { ok: false, message: 'Invalid device serial' };
     const r = await this.runner.run(['disconnect', serial], { timeoutMs: 10_000, ...opts });
     return { ok: r.code === 0 && !/error|no such device/i.test(r.text), message: r.text || 'adb disconnect failed' };
   }

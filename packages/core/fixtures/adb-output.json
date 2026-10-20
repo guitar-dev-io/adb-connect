@@ -68,6 +68,32 @@
       "name": "empty",
       "input": "List of devices attached\n\n",
       "expected": []
+    },
+    {
+      "name": "mDNS auto-connect with conflict-renamed serial containing a space (real capture, platform-tools 37)",
+      "input": "List of devices attached\nYXEMRCGYAI49S4SS       device usb:1310720X product:corot_global model:23078PND5G device:corot transport_id:1\n192.168.21.91:39925    device product:corot_global model:23078PND5G device:corot transport_id:7\nadb-YXEMRCGYAI49S4SS-DTDUwD (2)._adb-tls-connect._tcp device product:corot_global model:23078PND5G device:corot transport_id:3\n\n",
+      "expected": [
+        {
+          "serial": "YXEMRCGYAI49S4SS",
+          "state": "device",
+          "model": "23078PND5G",
+          "transport": "usb"
+        },
+        {
+          "serial": "192.168.21.91:39925",
+          "state": "device",
+          "model": "23078PND5G",
+          "transport": "wifi",
+          "endpoint": "192.168.21.91:39925"
+        },
+        {
+          "serial": "adb-YXEMRCGYAI49S4SS-DTDUwD (2)._adb-tls-connect._tcp",
+          "state": "device",
+          "model": "23078PND5G",
+          "transport": "wifi",
+          "mdnsName": "adb-YXEMRCGYAI49S4SS-DTDUwD"
+        }
+      ]
     }
   ],
   "trackDevicesFrames": [
@@ -100,6 +126,27 @@
           "name": "adbconnect-k2j4h5g6f7",
           "type": "pairing",
           "endpoint": "192.168.1.10:42761"
+        }
+      ]
+    },
+    {
+      "name": "stale + conflict-renamed live record, legacy _adb._tcp (real capture, platform-tools 37)",
+      "input": "List of discovered mdns services\nadb-YXEMRCGYAI49S4SS-DTDUwD (2)\t_adb-tls-connect._tcp\t192.168.21.91:39925\nadb-YXEMRCGYAI49S4SS-DTDUwD\t_adb-tls-connect._tcp\t192.168.21.91:35881\nadb-R5GL110FF1R-0FZHsg\t_adb._tcp\t192.168.21.58:5555\nadb-R5GL110FF1R-0FZHsg\t_adb-tls-connect._tcp\t192.168.21.58:34887\nadb-67d277cf-nR0Tpv\t_adb-tls-connect._tcp\t192.168.21.85:44251\n\n",
+      "expected": [
+        {
+          "name": "adb-YXEMRCGYAI49S4SS-DTDUwD",
+          "type": "connect",
+          "endpoint": "192.168.21.91:39925"
+        },
+        {
+          "name": "adb-R5GL110FF1R-0FZHsg",
+          "type": "connect",
+          "endpoint": "192.168.21.58:34887"
+        },
+        {
+          "name": "adb-67d277cf-nR0Tpv",
+          "type": "connect",
+          "endpoint": "192.168.21.85:44251"
         }
       ]
     }

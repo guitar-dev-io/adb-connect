@@ -3,6 +3,8 @@ export * from './adb/runner';
 export * from './adb/locate';
 export * from './adb/version';
 export * from './adb/client';
+export * from './adb/diagnose';
+export * from './discovery/system';
 export * from './devices/parse';
 export * from './devices/tracker';
 export * from './devices/model';

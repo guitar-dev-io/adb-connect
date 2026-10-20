@@ -7,7 +7,8 @@
 import { AdbClient } from './adb/client';
 import { AdbError } from './adb/runner';
 import { AdbEngine } from './engine';
-import { renderQrTerminal } from './pairing/render';
+import fs from 'fs';
+import { renderQrSvg, renderQrTerminal } from './pairing/render';
 import { pairWithCode } from './pairing/session';
 import { MdnsBrowser } from './discovery/browser';
 import { Logger } from './log';
@@ -33,6 +34,15 @@ function parseArgs(argv: string[]) {
   return { flags, positional };
 }
 
+/** Read one line; on a TTY prompt on stderr (the code is typed by the user, never passed as an argument). */
+async function readLine(prompt: string): Promise<string> {
+  if (!process.stdin.isTTY) return readStdin();
+  const rl = (await import('readline')).createInterface({ input: process.stdin, output: process.stderr, terminal: true });
+  const answer = await new Promise<string>(resolve => rl.question(prompt, resolve));
+  rl.close();
+  return answer.trim();
+}
+
 async function readStdin(): Promise<string> {
   if (process.stdin.isTTY) return '';
   let s = '';
@@ -49,11 +59,11 @@ const stderrLogger = (verbose: boolean): Logger => ({
 const USAGE = `usage: adb-connect [--adb PATH] [--verbose] <command>
   status                    adb info and devices
   devices                   devices (adb devices -l)
-  discover                  mDNS services
+  discover [--wait S]       mDNS services (adb + OS resolver)
   connect <host:port>
   disconnect <serial>
-  pair <host:port>          six-digit code from $ADB_CONNECT_PAIR_CODE or stdin
-  qr [--timeout SECONDS]    QR pairing; QR on stderr, progress events on stdout
+  pair [host:port]          six-digit code pairing; endpoint auto-discovered, code prompted (or $ADB_CONNECT_PAIR_CODE / stdin)
+  qr [--timeout S] [--html FILE]  QR pairing; QR on stderr (and FILE), progress events on stdout
   track                     stream device list changes until interrupted`;
 
 async function main() {
@@ -86,16 +96,38 @@ async function main() {
     case 'devices':
     case 'list-devices':
       return emit({ type: 'devices', ok: true, devices: await client.devices() });
-    case 'discover':
-      return emit({ type: 'services', ok: true, services: await client.mdnsServices() });
+    case 'discover': {
+      // adb's mDNS backend plus the OS resolver, collected for --wait seconds (default 4).
+      const browser = new MdnsBrowser(client, { logger });
+      const lease = browser.acquire();
+      await new Promise(r => setTimeout(r, (Number(flags.wait) > 0 ? Number(flags.wait) : 4) * 1000));
+      const services = browser.services;
+      lease.dispose();
+      browser.dispose();
+      return emit({ type: 'services', ok: true, services });
+    }
     case 'connect':
       return emit({ type: 'result', ...(await client.connect(arg ?? '')) });
     case 'disconnect':
       return emit({ type: 'result', ...(await client.disconnect(arg ?? '')) });
     case 'pair': {
-      const code = process.env.ADB_CONNECT_PAIR_CODE || (await readStdin());
       const browser = new MdnsBrowser(client, { logger });
-      const r = await pairWithCode(client, browser, arg ?? '', code, { onUpdate: u => emit({ type: 'pairing', ...u }) });
+      let endpoint = arg;
+      if (!endpoint) {
+        // The phone's "Pair device with pairing code" dialog advertises a pairing service; use it.
+        process.stderr.write('Waiting for a phone showing "Pair device with pairing code" (60 s)…\n');
+        const svc = await browser.waitFor(s => s.type === 'pairing' && !s.name.startsWith('adbconnect-'), { timeoutMs: 60_000 }).catch(() => undefined);
+        if (!svc) {
+          browser.dispose();
+          emit({ type: 'result', ok: false, state: 'timeout', message: 'No phone in pairing-code mode was found. Pass the IP address & Port explicitly.' });
+          return;
+        }
+        endpoint = svc.endpoint;
+        emit({ type: 'discovered', service: svc });
+        process.stderr.write(`Found ${svc.name} at ${svc.endpoint}\n`);
+      }
+      const code = process.env.ADB_CONNECT_PAIR_CODE || (await readLine(`Six-digit Wi-Fi pairing code for ${endpoint}: `));
+      const r = await pairWithCode(client, browser, endpoint, code, { onUpdate: u => emit({ type: 'pairing', ...u }) });
       browser.dispose();
       emit({ type: 'result', ok: r.state === 'connected' || r.state === 'paired', ...r });
       return;
@@ -105,11 +137,17 @@ async function main() {
       const timeout = Number(flags.timeout) > 0 ? Number(flags.timeout) * 1000 : 120_000;
       const session = engine.createQrSession({ scanTimeoutMs: timeout, onUpdate: u => emit({ type: 'pairing', ...u }) });
       process.stderr.write(await renderQrTerminal(session.payload));
+      if (typeof flags.html === 'string') {
+        // Standalone page with the QR (for showing in a browser). Holds the one-time password; delete after use.
+        const svg = await renderQrSvg(session.payload);
+        fs.writeFileSync(flags.html, `<!doctype html><meta charset="utf-8"><title>ADB Connect QR</title><body style="font:16px system-ui;text-align:center;padding:24px"><h2>Pair via QR Code</h2><div style="width:320px;margin:auto">${svg}</div><p>Phone: Settings › Developer options › Wireless debugging › <b>Pair device with QR code</b></p></body>`, { mode: 0o600 });
+      }
       process.stderr.write('\nScan with: Settings > Developer options > Wireless debugging > Pair device with QR code\n');
       process.once('SIGINT', () => session.cancel());
       const r = await session.run();
       emit({ type: 'result', ok: r.state === 'connected' || r.state === 'paired', ...r });
       engine.dispose();
+      if (typeof flags.html === 'string') fs.rmSync(flags.html, { force: true });
       return;
     }
     case 'track': {

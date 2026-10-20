@@ -6,32 +6,114 @@
   "publisher": "guitar-dev-io",
   "license": "MIT",
   "icon": "media/icon.png",
-  "galleryBanner": { "color": "#0E141D", "theme": "dark" },
-  "repository": { "type": "git", "url": "https://github.com/guitar-dev-io/adb-connect.git" },
-  "bugs": { "url": "https://github.com/guitar-dev-io/adb-connect/issues" },
+  "galleryBanner": {
+    "color": "#0E141D",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guitar-dev-io/adb-connect.git"
+  },
+  "bugs": {
+    "url": "https://github.com/guitar-dev-io/adb-connect/issues"
+  },
   "homepage": "https://github.com/guitar-dev-io/adb-connect#readme",
-  "engines": { "vscode": "^1.85.0" },
-  "categories": ["Debuggers", "Other"],
-  "keywords": ["adb", "android", "wireless debugging", "adb pair", "qr", "flutter", "react native", "device"],
+  "sponsor": {
+    "url": "https://github.com/sponsors/guitar-dev-io"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Debuggers",
+    "Other"
+  ],
+  "keywords": [
+    "adb",
+    "android",
+    "wireless debugging",
+    "adb pair",
+    "qr",
+    "flutter",
+    "react native",
+    "device"
+  ],
   "main": "./dist/extension.js",
-  "activationEvents": ["onStartupFinished"],
-  "extensionKind": ["ui", "workspace"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "extensionKind": [
+    "ui",
+    "workspace"
+  ],
   "capabilities": {
-    "untrustedWorkspaces": { "supported": true, "description": "ADB Connect never runs workspace code. The adb path can only be set in user (machine) settings." },
+    "untrustedWorkspaces": {
+      "supported": true,
+      "description": "ADB Connect never runs workspace code. The adb path can only be set in user (machine) settings."
+    },
     "virtualWorkspaces": true
   },
   "contributes": {
     "commands": [
-      { "command": "adbConnect.menu", "title": "Quick Actions", "category": "ADB Connect" },
-      { "command": "adbConnect.connect", "title": "Connect Device", "category": "ADB Connect", "icon": "$(plug)" },
-      { "command": "adbConnect.reconnect", "title": "Reconnect", "category": "ADB Connect", "icon": "$(sync)" },
-      { "command": "adbConnect.disconnect", "title": "Disconnect", "category": "ADB Connect", "icon": "$(debug-disconnect)" },
-      { "command": "adbConnect.pairQr", "title": "Pair via QR Code", "category": "ADB Connect", "icon": "$(device-camera)" },
-      { "command": "adbConnect.pairCode", "title": "Pair via Pairing Code", "category": "ADB Connect", "icon": "$(key)" },
-      { "command": "adbConnect.discover", "title": "Discover Devices", "category": "ADB Connect", "icon": "$(search)" },
-      { "command": "adbConnect.devices", "title": "Manage Devices", "category": "ADB Connect", "icon": "$(list-unordered)" },
-      { "command": "adbConnect.settings", "title": "Settings", "category": "ADB Connect", "icon": "$(gear)" },
-      { "command": "adbConnect.logs", "title": "View Logs", "category": "ADB Connect", "icon": "$(output)" }
+      {
+        "command": "adbConnect.menu",
+        "title": "Quick Actions",
+        "category": "ADB Connect"
+      },
+      {
+        "command": "adbConnect.connect",
+        "title": "Connect Device",
+        "category": "ADB Connect",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "adbConnect.reconnect",
+        "title": "Reconnect",
+        "category": "ADB Connect",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "adbConnect.disconnect",
+        "title": "Disconnect",
+        "category": "ADB Connect",
+        "icon": "$(debug-disconnect)"
+      },
+      {
+        "command": "adbConnect.pairQr",
+        "title": "Pair via QR Code",
+        "category": "ADB Connect",
+        "icon": "$(device-camera)"
+      },
+      {
+        "command": "adbConnect.pairCode",
+        "title": "Pair via Pairing Code",
+        "category": "ADB Connect",
+        "icon": "$(key)"
+      },
+      {
+        "command": "adbConnect.discover",
+        "title": "Discover Devices",
+        "category": "ADB Connect",
+        "icon": "$(search)"
+      },
+      {
+        "command": "adbConnect.devices",
+        "title": "Manage Devices",
+        "category": "ADB Connect",
+        "icon": "$(list-unordered)"
+      },
+      {
+        "command": "adbConnect.settings",
+        "title": "Settings",
+        "category": "ADB Connect",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "adbConnect.logs",
+        "title": "View Logs",
+        "category": "ADB Connect",
+        "icon": "$(output)"
+      }
     ],
     "configuration": {
       "title": "ADB Connect",

@@ -15,7 +15,7 @@ const known = (over: Partial<KnownDevice> = {}): KnownDevice => ({
 
 function setup(fake: Fake, devices: KnownDevice[], autoReconnect = true) {
   const tracker = new DeviceTracker(fake.runner, { minBackoffMs: 50 });
-  const browser = new MdnsBrowser(fake.client, { intervalMs: 20 });
+  const browser = new MdnsBrowser(fake.client, { intervalMs: 20, systemResolver: false });
   const store = new MemoryKnownDeviceStore(devices);
   const mgr = new ConnectionManager(fake.client, tracker, browser, store, { autoReconnect, retryDelayMs: 30, maxAttempts: 3 });
   return {

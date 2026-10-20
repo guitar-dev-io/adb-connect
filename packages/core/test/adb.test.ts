@@ -111,3 +111,19 @@ test('connect/disconnect validate input and never run bare `adb disconnect`', as
   }
   await sleep(0);
 });
+
+test('diagnoses adb being blocked from a reachable LAN host', async () => {
+  const { diagnoseUnreachable, tcpReachable } = await import('../src/adb/diagnose');
+  const net = await import('net');
+  const server = net.createServer(s => s.destroy()).listen(0, '127.0.0.1');
+  await new Promise(r => server.once('listening', r));
+  const port = (server.address() as import('net').AddressInfo).port;
+  try {
+    assert.equal(await tcpReachable(`127.0.0.1:${port}`), true);
+    assert.match((await diagnoseUnreachable(`127.0.0.1:${port}`, "failed to connect to '127.0.0.1': No route to host"))!, /Local Network/);
+    assert.equal(await diagnoseUnreachable(`127.0.0.1:${port}`, 'failed to connect: Connection refused'), undefined);
+  } finally {
+    server.close();
+  }
+  assert.equal(await diagnoseUnreachable('127.0.0.1:1', 'No route to host'), undefined, 'genuinely unreachable → no hint');
+});

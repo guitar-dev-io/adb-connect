@@ -8,7 +8,7 @@ const GUID = 'adb-35121FDH2000AB-Qz5WvP';
 
 test('QR pairing: phone scans, advertises our service name, adb pair with our password, then connect', async () => {
   const fake = makeFake();
-  const browser = new MdnsBrowser(fake.client, { intervalMs: 20 });
+  const browser = new MdnsBrowser(fake.client, { intervalMs: 20, systemResolver: false });
   const updates: PairingUpdate[] = [];
   const session = new QrPairingSession(fake.client, browser, { scanTimeoutMs: 5000, connectTimeoutMs: 3000, onUpdate: u => updates.push(u) });
   const { serviceName, password } = session.credentials;
@@ -41,7 +41,7 @@ test('QR pairing: phone scans, advertises our service name, adb pair with our pa
 
 test('QR pairing: adb auto-connects after pairing → no extra adb connect', async () => {
   const fake = makeFake();
-  const browser = new MdnsBrowser(fake.client, { intervalMs: 20 });
+  const browser = new MdnsBrowser(fake.client, { intervalMs: 20, systemResolver: false });
   const session = new QrPairingSession(fake.client, browser, { scanTimeoutMs: 5000, connectTimeoutMs: 3000 });
   try {
     fake.set({ pair: { '10.0.0.5:40001': { secret: session.credentials.password, guid: GUID, connectEndpoint: '10.0.0.5:40002' } } });
@@ -60,7 +60,7 @@ test('QR pairing: adb auto-connects after pairing → no extra adb connect', asy
 
 test('QR pairing timeout and cancel', async () => {
   const fake = makeFake();
-  const browser = new MdnsBrowser(fake.client, { intervalMs: 20 });
+  const browser = new MdnsBrowser(fake.client, { intervalMs: 20, systemResolver: false });
   try {
     const timedOut = await new QrPairingSession(fake.client, browser, { scanTimeoutMs: 150 }).run();
     assert.equal(timedOut.state, 'timeout');
@@ -79,7 +79,7 @@ test('QR pairing timeout and cancel', async () => {
 
 test('QR pairing refuses when adb mDNS backend is unavailable (no fake fallback)', async () => {
   const fake = makeFake({ mdnsAvailable: false });
-  const browser = new MdnsBrowser(fake.client);
+  const browser = new MdnsBrowser(fake.client, { systemResolver: false });
   try {
     const r = await new QrPairingSession(fake.client, browser).run();
     assert.equal(r.state, 'failed');
@@ -95,7 +95,7 @@ test('six-digit code pairing: wrong code fails, right code pairs and connects', 
     pair: { '192.168.1.10:42761': { secret: '482913', guid: GUID, connectEndpoint: '192.168.1.10:37123' } },
     connect: { '192.168.1.10:37123': '192.168.1.10:37123 device model:Pixel_9_Pro' },
   });
-  const browser = new MdnsBrowser(fake.client, { intervalMs: 20 });
+  const browser = new MdnsBrowser(fake.client, { intervalMs: 20, systemResolver: false });
   try {
     const bad = await pairWithCode(fake.client, browser, '192.168.1.10:42761', '000000');
     assert.equal(bad.state, 'failed');
@@ -111,7 +111,7 @@ test('six-digit code pairing: wrong code fails, right code pairs and connects', 
 
 test('paired but connect service never appears → "paired" with guidance', async () => {
   const fake = makeFake({ pair: { '192.168.1.10:42761': { secret: '482913', guid: GUID } } });
-  const browser = new MdnsBrowser(fake.client, { intervalMs: 20 });
+  const browser = new MdnsBrowser(fake.client, { intervalMs: 20, systemResolver: false });
   try {
     const r = await pairWithCode(fake.client, browser, '192.168.1.10:42761', '482913', { connectTimeoutMs: 150 });
     assert.equal(r.state, 'paired');

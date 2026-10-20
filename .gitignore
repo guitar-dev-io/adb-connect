@@ -5,3 +5,5 @@ packages/*/dist
 extensions/*/dist
 .env
 .DS_Store
+
+.agents

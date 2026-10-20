@@ -12,6 +12,8 @@ export interface AdbEngineOptions extends AdbClientOptions {
   autoReconnect?: boolean;
   logger?: Logger;
   mdnsIntervalMs?: number;
+  /** Also use the OS mDNS resolver (dns-sd / avahi). Default true. */
+  systemResolver?: boolean;
 }
 
 /** Everything an IDE integration needs, wired together. IDE code adds UI, settings and persistence. */
@@ -28,7 +30,7 @@ export class AdbEngine {
     const logger = opts.logger ?? nullLogger;
     const client = await AdbClient.create({ ...opts, logger });
     const tracker = new DeviceTracker(client.runner, { logger });
-    const browser = new MdnsBrowser(client, { logger, intervalMs: opts.mdnsIntervalMs });
+    const browser = new MdnsBrowser(client, { logger, intervalMs: opts.mdnsIntervalMs, systemResolver: opts.systemResolver });
     const connections = new ConnectionManager(client, tracker, browser, opts.store ?? new MemoryKnownDeviceStore(), {
       autoReconnect: opts.autoReconnect ?? true,
       logger,

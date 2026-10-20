@@ -1,0 +1,162 @@
+<!doctype html>
+<!--
+  Static harness that renders the REAL Device Manager webview assets
+  (../../media/common.css + manager.css + icons.js + manager.js) outside VS Code.
+  Pick a palette with ?theme=light|dark (default dark). Used only to capture
+  the docs/ui/*.png comparison screenshots for Phase 7 (FEAT-002).
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Device Manager harness</title>
+    <style id="palette"></style>
+    <link rel="stylesheet" href="../../media/common.css" />
+    <link rel="stylesheet" href="../../media/manager.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      // --- representative VS Code theme palettes -------------------------------
+      const PALETTES = {
+        dark: {
+          foreground: '#cccccc',
+          'font-family': "-apple-system, 'Segoe UI', Ubuntu, sans-serif",
+          'font-size': '13px',
+          'editor-font-family': "'SF Mono', Menlo, Consolas, monospace",
+          'editor-background': '#1e1e1e',
+          'editorWidget-background': '#252526',
+          'sideBar-background': '#252526',
+          'widget-border': '#3c3c3c',
+          'panel-border': '#2b2b2b',
+          descriptionForeground: '#9d9d9d',
+          focusBorder: '#0e639c',
+          'button-background': '#0e639c',
+          'button-foreground': '#ffffff',
+          'button-hoverBackground': '#1177bb',
+          'button-border': 'transparent',
+          'button-secondaryBackground': '#313131',
+          'button-secondaryForeground': '#cccccc',
+          'button-secondaryHoverBackground': '#3c3c3c',
+          'list-hoverBackground': '#2a2d2e',
+          'toolbar-hoverBackground': '#2a2d2e',
+          'icon-foreground': '#c5c5c5',
+          'textLink-foreground': '#4daafc',
+          'textLink-activeForeground': '#4daafc',
+          'testing-iconPassed': '#73c991',
+          'editorWarning-foreground': '#cca700',
+          errorForeground: '#f14c4c',
+          'progressBar-background': '#0e70c0',
+          'inputValidation-errorBackground': '#5a1d1d',
+          'inputValidation-errorBorder': '#be1100',
+          'badge-background': '#4d4d4d',
+          'badge-foreground': '#ffffff',
+        },
+        light: {
+          foreground: '#3b3b3b',
+          'font-family': "-apple-system, 'Segoe UI', Ubuntu, sans-serif",
+          'font-size': '13px',
+          'editor-font-family': "'SF Mono', Menlo, Consolas, monospace",
+          'editor-background': '#ffffff',
+          'editorWidget-background': '#f3f3f3',
+          'sideBar-background': '#f8f8f8',
+          'widget-border': '#d4d4d4',
+          'panel-border': '#e5e5e5',
+          descriptionForeground: '#767676',
+          focusBorder: '#0090f1',
+          'button-background': '#005fb8',
+          'button-foreground': '#ffffff',
+          'button-hoverBackground': '#0258a8',
+          'button-border': 'transparent',
+          'button-secondaryBackground': '#e5e5e5',
+          'button-secondaryForeground': '#3b3b3b',
+          'button-secondaryHoverBackground': '#cccccc',
+          'list-hoverBackground': '#e8e8e8',
+          'toolbar-hoverBackground': '#e8e8e8',
+          'icon-foreground': '#424242',
+          'textLink-foreground': '#005fb8',
+          'textLink-activeForeground': '#005fb8',
+          'testing-iconPassed': '#1a7f37',
+          'editorWarning-foreground': '#bf8803',
+          errorForeground: '#e51400',
+          'progressBar-background': '#005fb8',
+          'inputValidation-errorBackground': '#fdf0f0',
+          'inputValidation-errorBorder': '#e51400',
+          'badge-background': '#c4c4c4',
+          'badge-foreground': '#3b3b3b',
+        },
+      }
+      const theme =
+        new URLSearchParams(location.search).get('theme') === 'light'
+          ? 'light'
+          : 'dark'
+      const vars = Object.entries(PALETTES[theme])
+        .map(([k, v]) => `  --vscode-${k}: ${v};`)
+        .join('\n')
+      document.getElementById('palette').textContent = `:root {\n${vars}\n}`
+      document.body.style.colorScheme = theme
+
+      // --- stub the VS Code webview API ----------------------------------------
+      window.acquireVsCodeApi = () => ({
+        postMessage() {},
+        getState() {},
+        setState() {},
+      })
+    </script>
+    <script src="../../media/icons.js"></script>
+    <script src="../../media/manager.js"></script>
+    <script>
+      // Representative state: connected Pixel + paired Samsung + disconnected Nothing Phone.
+      window.postMessage(
+        {
+          type: 'state',
+          state: {
+            adb: 'adb 35.0.2 · Wireless Android Debugging',
+            activity: null,
+            error: null,
+            entries: [
+              {
+                id: 'pixel',
+                name: 'Pixel 9 Pro',
+                status: 'connected',
+                transport: 'wifi',
+                endpoint: '192.168.1.45:37123',
+                serial: '192.168.1.45:37123',
+                known: true,
+                paired: true,
+                preferred: true,
+                autoReconnect: true,
+              },
+              {
+                id: 'samsung',
+                name: 'Samsung S24',
+                status: 'available',
+                transport: 'wifi',
+                endpoint: '192.168.1.62:40217',
+                serial: '192.168.1.62:40217',
+                known: true,
+                paired: true,
+                preferred: false,
+                autoReconnect: true,
+              },
+              {
+                id: 'nothing',
+                name: 'Nothing Phone (2)',
+                status: 'disconnected',
+                transport: 'wifi',
+                endpoint: '192.168.1.88:37621',
+                serial: '192.168.1.88:37621',
+                known: true,
+                paired: true,
+                preferred: false,
+                autoReconnect: false,
+                userDisconnected: true,
+              },
+            ],
+          },
+        },
+        '*',
+      )
+    </script>
+  </body>
+</html>

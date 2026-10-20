@@ -1,0 +1,119 @@
+<!doctype html>
+<!--
+  Static harness that renders the REAL QR pairing webview assets
+  (../../media/common.css + qr.css + icons.js + qr.js) outside VS Code.
+  Pick a palette with ?theme=light|dark (default dark). Used only to capture
+  the docs/ui/*.png comparison screenshots for Phase 7 (FEAT-002).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR pairing harness</title>
+<style id="palette"></style>
+<link rel="stylesheet" href="../../media/common.css">
+<link rel="stylesheet" href="../../media/qr.css">
+</head>
+<body>
+<div id="app"></div>
+<script>
+  const PALETTES = {
+    dark: {
+      'foreground': '#cccccc',
+      'font-family': "-apple-system, 'Segoe UI', Ubuntu, sans-serif",
+      'font-size': '13px',
+      'editor-font-family': "'SF Mono', Menlo, Consolas, monospace",
+      'editor-background': '#1e1e1e',
+      'editorWidget-background': '#252526',
+      'sideBar-background': '#252526',
+      'widget-border': '#3c3c3c',
+      'panel-border': '#2b2b2b',
+      'descriptionForeground': '#9d9d9d',
+      'focusBorder': '#0e639c',
+      'button-background': '#0e639c',
+      'button-foreground': '#ffffff',
+      'button-hoverBackground': '#1177bb',
+      'button-border': 'transparent',
+      'button-secondaryBackground': '#313131',
+      'button-secondaryForeground': '#cccccc',
+      'button-secondaryHoverBackground': '#3c3c3c',
+      'list-hoverBackground': '#2a2d2e',
+      'toolbar-hoverBackground': '#2a2d2e',
+      'icon-foreground': '#c5c5c5',
+      'textLink-foreground': '#4daafc',
+      'textLink-activeForeground': '#4daafc',
+      'testing-iconPassed': '#73c991',
+      'editorWarning-foreground': '#cca700',
+      'errorForeground': '#f14c4c',
+      'progressBar-background': '#0e70c0',
+      'inputValidation-errorBackground': '#5a1d1d',
+      'inputValidation-errorBorder': '#be1100',
+    },
+    light: {
+      'foreground': '#3b3b3b',
+      'font-family': "-apple-system, 'Segoe UI', Ubuntu, sans-serif",
+      'font-size': '13px',
+      'editor-font-family': "'SF Mono', Menlo, Consolas, monospace",
+      'editor-background': '#ffffff',
+      'editorWidget-background': '#f3f3f3',
+      'sideBar-background': '#f8f8f8',
+      'widget-border': '#d4d4d4',
+      'panel-border': '#e5e5e5',
+      'descriptionForeground': '#767676',
+      'focusBorder': '#0090f1',
+      'button-background': '#005fb8',
+      'button-foreground': '#ffffff',
+      'button-hoverBackground': '#0258a8',
+      'button-border': 'transparent',
+      'button-secondaryBackground': '#e5e5e5',
+      'button-secondaryForeground': '#3b3b3b',
+      'button-secondaryHoverBackground': '#cccccc',
+      'list-hoverBackground': '#e8e8e8',
+      'toolbar-hoverBackground': '#e8e8e8',
+      'icon-foreground': '#424242',
+      'textLink-foreground': '#005fb8',
+      'textLink-activeForeground': '#005fb8',
+      'testing-iconPassed': '#1a7f37',
+      'editorWarning-foreground': '#bf8803',
+      'errorForeground': '#e51400',
+      'progressBar-background': '#005fb8',
+      'inputValidation-errorBackground': '#fdf0f0',
+      'inputValidation-errorBorder': '#e51400',
+    },
+  };
+  const theme = new URLSearchParams(location.search).get('theme') === 'light' ? 'light' : 'dark';
+  const vars = Object.entries(PALETTES[theme]).map(([k, v]) => `  --vscode-${k}: ${v};`).join('\n');
+  document.getElementById('palette').textContent = `:root {\n${vars}\n}`;
+  document.body.style.colorScheme = theme;
+  window.acquireVsCodeApi = () => ({ postMessage() {}, getState() {}, setState() {} });
+
+  // A representative pairing QR as an inline SVG (static demo pattern, not a real code).
+  function demoQrSvg() {
+    const n = 21, cell = 10, size = n * cell;
+    let seed = 1234567;
+    const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+    let rects = '';
+    const finder = (ox, oy) => {
+      rects += `<rect x="${ox}" y="${oy}" width="${7 * cell}" height="${7 * cell}" fill="#000"/>`;
+      rects += `<rect x="${ox + cell}" y="${oy + cell}" width="${5 * cell}" height="${5 * cell}" fill="#fff"/>`;
+      rects += `<rect x="${ox + 2 * cell}" y="${oy + 2 * cell}" width="${3 * cell}" height="${3 * cell}" fill="#000"/>`;
+    };
+    for (let y = 0; y < n; y++) {
+      for (let x = 0; x < n; x++) {
+        const inFinder = (x < 8 && y < 8) || (x > 12 && y < 8) || (x < 8 && y > 12);
+        if (inFinder) continue;
+        if (rnd() > 0.5) rects += `<rect x="${x * cell}" y="${y * cell}" width="${cell}" height="${cell}" fill="#000"/>`;
+      }
+    }
+    finder(0, 0); finder((n - 7) * cell, 0); finder(0, (n - 7) * cell);
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}"><rect width="${size}" height="${size}" fill="#fff"/>${rects}</svg>`;
+  }
+</script>
+<script src="../../media/icons.js"></script>
+<script src="../../media/qr.js"></script>
+<script>
+  window.postMessage({ type: 'qr', svg: demoQrSvg(), expiresAt: Date.now() + 118000 }, '*');
+  window.postMessage({ type: 'update', update: { state: 'waiting-for-scan', message: 'Waiting for scan…' } }, '*');
+</script>
+</body>
+</html>

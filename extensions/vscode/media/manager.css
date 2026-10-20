@@ -1,10 +1,24 @@
 header.top {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
   margin-bottom: 18px;
 }
-header.top .logo { width: 36px; height: 36px; }
-header.top .titles { flex: 1; min-width: 160px; }
-header.top .activity { display: inline-flex; gap: 8px; align-items: center; color: var(--ac-muted); }
+header.top .logo {
+  width: 36px;
+  height: 36px;
+}
+header.top .titles {
+  flex: 1;
+  min-width: 160px;
+}
+header.top .activity {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--ac-muted);
+}
 
 .tiles {
   display: grid;
@@ -12,44 +26,108 @@ header.top .activity { display: inline-flex; gap: 8px; align-items: center; colo
   gap: 8px;
 }
 .tiles button {
-  flex-direction: column; gap: 6px;
+  flex-direction: column;
+  gap: 6px;
   padding: 12px 8px;
   border-radius: var(--ac-radius);
   border: 1px solid var(--ac-border);
   background: var(--ac-card-bg);
   color: var(--vscode-foreground);
-  white-space: normal; text-align: center;
+  white-space: normal;
+  text-align: center;
 }
-.tiles button:hover { background: var(--vscode-list-hoverBackground); }
-.tiles button.primary { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border-color: transparent; }
-.tiles button.primary:hover { background: var(--vscode-button-hoverBackground); }
-.tiles svg.i { width: 20px; height: 20px; }
+.tiles button:hover {
+  background: var(--vscode-list-hoverBackground);
+}
+.tiles button.primary {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border-color: transparent;
+}
+.tiles button.primary:hover {
+  background: var(--vscode-button-hoverBackground);
+}
+.tiles svg.i {
+  width: 20px;
+  height: 20px;
+}
 
-.list { display: flex; flex-direction: column; gap: 8px; }
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
 .device {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  grid-template-areas: "icon info badges" "icon info actions";
-  gap: 4px 14px;
+  grid-template-areas: 'icon info badges' 'icon info actions';
+  gap: 10px 16px;
   align-items: center;
-  padding: 12px 14px;
+  padding: 14px 16px;
 }
-.device.preferred { border-color: var(--vscode-focusBorder); }
-.device .dicon { grid-area: icon; width: 26px; height: 26px; color: var(--ac-muted); }
-.device.connected .dicon { color: var(--ac-ok); }
-.device .info { grid-area: info; min-width: 0; }
-.device .name { font-weight: 600; display: flex; align-items: center; gap: 6px; overflow-wrap: anywhere; }
-.device .name .star { color: var(--ac-warn); width: 14px; height: 14px; fill: currentColor; }
-.device .meta { color: var(--ac-muted); overflow-wrap: anywhere; }
-.device .badges { grid-area: badges; display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
-.device .actions { grid-area: actions; display: flex; gap: 4px; justify-content: flex-end; flex-wrap: wrap; }
+.device.preferred {
+  border-color: var(--vscode-focusBorder);
+}
+.device .dicon {
+  grid-area: icon;
+  width: 28px;
+  height: 28px;
+  color: var(--ac-muted);
+}
+.device.connected .dicon {
+  color: var(--ac-ok);
+}
+.device .info {
+  grid-area: info;
+  min-width: 0;
+}
+.device .name {
+  font-weight: 600;
+  font-size: 1.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-wrap: anywhere;
+}
+.device .name .star {
+  color: var(--ac-warn);
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+.device .meta {
+  color: var(--ac-muted);
+  overflow-wrap: anywhere;
+}
+.device .badges {
+  grid-area: badges;
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.device .actions {
+  grid-area: actions;
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
 
 /* Narrow editor groups / side-by-side layouts */
 @media (max-width: 520px) {
-  .device { grid-template-columns: auto 1fr; grid-template-areas: "icon info" "badges badges" "actions actions"; }
-  .device .badges, .device .actions { justify-content: flex-start; }
-  .tiles { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+  .device {
+    grid-template-columns: auto 1fr;
+    grid-template-areas: 'icon info' 'badges badges' 'actions actions';
+  }
+  .device .badges,
+  .device .actions {
+    justify-content: flex-start;
+  }
+  .tiles {
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  }
 }
 
 .empty {
@@ -57,7 +135,16 @@ header.top .activity { display: inline-flex; gap: 8px; align-items: center; colo
   border: 1px dashed var(--ac-border);
   border-radius: var(--ac-radius);
 }
-.empty ol { margin: 10px 0 0; padding-left: 20px; }
-.empty li { margin: 4px 0; }
+.empty ol {
+  margin: 10px 0 0;
+  padding-left: 20px;
+}
+.empty li {
+  margin: 4px 0;
+}
 
-footer { margin-top: 22px; color: var(--ac-muted); font-size: .9em; }
+footer {
+  margin-top: 22px;
+  color: var(--ac-muted);
+  font-size: 0.9em;
+}

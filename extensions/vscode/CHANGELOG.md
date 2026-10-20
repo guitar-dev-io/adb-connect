@@ -5,6 +5,13 @@ All notable changes to the ADB Connect VS Code extension are documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1]
+
+### Fixed
+
+- Marketplace README screenshots now load: images are referenced by absolute raw
+  GitHub URLs instead of repo-relative paths, which the Marketplace does not resolve.
+
 ## [0.2.0]
 
 ### Added
@@ -38,4 +45,5 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   Windsurf, and other VS Code-based IDEs (`npm run -w extensions/vscode package` and the
   `package:ovsx` script).
 
+[0.2.1]: https://github.com/guitar-dev-io/adb-connect/releases/tag/v0.2.1
 [0.2.0]: https://github.com/guitar-dev-io/adb-connect/releases/tag/v0.2.0

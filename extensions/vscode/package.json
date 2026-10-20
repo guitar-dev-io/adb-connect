@@ -2,7 +2,7 @@
   "name": "adb-connect-vscode",
   "displayName": "ADB Connect — Wireless Android Debugging",
   "description": "Pair and connect Android devices over Wi-Fi in one click: real QR pairing, six-digit code pairing, mDNS discovery, device manager and smart auto-reconnect.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "guitar-dev-io",
   "license": "MIT",
   "icon": "media/icon.png",

@@ -32,17 +32,17 @@ See [docs/FEATURES.md](./docs/FEATURES.md) for the full list.
 
 Device Manager, light and dark themes:
 
-![Device Manager — light theme](./docs/ui/manager-light.png)
-![Device Manager — dark theme](./docs/ui/manager-dark.png)
+![Device Manager — light theme](https://raw.githubusercontent.com/guitar-dev-io/adb-connect/main/extensions/vscode/docs/ui/manager-light.png)
+![Device Manager — dark theme](https://raw.githubusercontent.com/guitar-dev-io/adb-connect/main/extensions/vscode/docs/ui/manager-dark.png)
 
 Narrow window layout:
 
-![Device Manager — narrow window](./docs/ui/manager-narrow.png)
+![Device Manager — narrow window](https://raw.githubusercontent.com/guitar-dev-io/adb-connect/main/extensions/vscode/docs/ui/manager-narrow.png)
 
 QR pairing view:
 
-![QR pairing — light theme](./docs/ui/qr-light.png)
-![QR pairing — dark theme](./docs/ui/qr-dark.png)
+![QR pairing — light theme](https://raw.githubusercontent.com/guitar-dev-io/adb-connect/main/extensions/vscode/docs/ui/qr-light.png)
+![QR pairing — dark theme](https://raw.githubusercontent.com/guitar-dev-io/adb-connect/main/extensions/vscode/docs/ui/qr-dark.png)
 
 ## Quick start
 
@@ -93,8 +93,8 @@ without a physical device) are in [docs/VALIDATION.md](./docs/VALIDATION.md).
 From the repo root: `npm install && npm run build`, then open the repo and launch an
 Extension Development Host with `extensions/vscode` as the extension path. The extension is
 bundled with esbuild (`@adb-connect/core` and `qrcode` are inlined). Package a VSIX with
-`npm run -w extensions/vscode package` (output: `dist/adb-connect-vscode-0.2.0.vsix` at the
-repo root).
+`npm run -w extensions/vscode package` (output: `dist/adb-connect-vscode-<version>.vsix` at
+the repo root).
 
 ## License
 
